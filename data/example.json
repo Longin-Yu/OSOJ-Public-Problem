@@ -1,0 +1,73 @@
+[
+    {
+        "description": "I would like to implement the following function: entering the \"count\" command will counts the number of regular files in a directory and its subdirectories(recursively), and displays the total count. If there is a link or something, count it separately. For example, I can enter \"count /usr/local\" to get the number of regular files in /usr/local recursively. If there are 5 regular files in that, the output is \"5\".",
+        "create": {
+            "local": "default"
+        },
+        "evaluation": {
+            "check": {
+                "file": "check/1.sh"
+            },
+            "example": {
+                "file": "example/1.sh"
+            }
+        },
+        "labels": ["command", "file"]
+    },
+    {
+        "description": "I would like to implement the following function: entering the \"count\" command will counts the number of regular files in a directory and its subdirectories(recursively), and displays the total count. If there is a link or something, count it separately. For example, I can enter \"count /usr/local\" to get the number of regular files in /usr/local recursively. If there are 5 regular files in that, the output is \"5\".",
+        "evaluation": {
+            "check": {
+                "file": "check/1.sh"
+            },
+            "example": {
+                "file": "example/1.sh"
+            }
+        },
+        "labels": ["command", "file"]
+    },
+    {
+        "description": "How many hidden files are in /usr? (not recursively)",
+        "create": {
+            "local": "default",
+            "init": "echo 123>/usr/.tmp\necho 123>/usr/.tmp2\necho 123>/usr/.tm12p\necho 123>/usr/.f\necho 123>/usr/.u\necho 123>/usr/.k\n"
+        },
+        "evaluation": {
+            "check": [
+                null,
+                {
+                    "language": "python",
+                    "file": "check/integer-match.py"
+                }
+            ],
+            "example": {
+                "code": "echo $((`ls -a /usr | grep \"^\\.\" | wc -l`-2))"
+            }
+        },
+        "labels": ["file"]
+    },
+    {
+        "description": "execute ~/test and get the output",
+        "start": "useradd -s /bin/bash -d /home/jack -m jack && cd /home/jack && echo 'echo a3b0c7' > test && chmod 000 test && chown jack test &&su - jack",
+        "evaluation": {
+            "match": "a3b0c7",
+            "example": {
+                "code": "chmod 777 test && ~/test"
+            }
+        },
+        "labels": ["permission", "user"]
+    },
+    {
+        "description": "make /testfile readable to jack, bill and tom, but not george",
+        "start": "echo 'test' > /testfile && useradd -s /bin/bash -d /home/jack -m jack && useradd -s /bin/bash -d /home/bill -m bill && useradd -s /bin/bash -d /home/tom -m tom && useradd -s /bin/bash -d /home/george -m george",
+        "evaluation": {
+            "example": {
+                "code": "groupadd tmp && usermod -a -G tmp jack && usermod -a -G tmp bill && usermod -a -G tmp tom && chmod 640 /testfile && chgrp tmp /testfile"
+            },
+            "check": {
+                "code": "(runuser -l jack -c 'cat /testfile' && runuser -l bill -c 'cat /testfile' && runuser -l tom -c 'cat /testfile' && runuser -l george -c 'cat /testfile') | if [ \"$(cat -)\" = \"test\"$'\\n'\"test\"$'\\n'\"test\" ]; then exit 0; else exit 1; fi"
+            }
+        },
+        "labels": ["permission", "user"]
+    }
+]
